@@ -1,0 +1,610 @@
+diff --git a/app/admin/dashboard/companies/page.tsx b/app/admin/dashboard/companies/page.tsx
+new file mode 100644
+index 0000000..1671beb
+--- /dev/null
++++ b/app/admin/dashboard/companies/page.tsx
+@@ -0,0 +1,101 @@
++'use client'
++
++import { useEffect, useState } from 'react'
++import { API_URL, authHeaders } from '@/lib/api'
++import { useAdminAuth } from '@/lib/useAdminAuth'
++import AdminNav from '@/components/AdminNav'
++
++interface Company {
++  id: string
++  name: string
++  cuit: string
++  email: string
++  phone: string
++  approved: boolean
++  commission_pct: number
++  created_at: string
++}
++
++export default function AdminCompaniesPage() {
++  const token = useAdminAuth()
++  const [companies, setCompanies] = useState<Company[]>([])
++  const [loading, setLoading] = useState(true)
++  const [approvingId, setApprovingId] = useState<string | null>(null)
++
++  function loadCompanies(authToken: string) {
++    return fetch(`${API_URL}/companies`, { headers: authHeaders(authToken) })
++      .then((r) => r.json())
++      .then((data) => setCompanies(Array.isArray(data) ? data : []))
++  }
++
++  useEffect(() => {
++    if (!token) return
++    loadCompanies(token).finally(() => setLoading(false))
++  }, [token])
++
++  async function handleApprove(id: string) {
++    if (!token) return
++    setApprovingId(id)
++    await fetch(`${API_URL}/companies/${id}/approve`, {
++      method: 'PATCH',
++      headers: authHeaders(token),
++    })
++    await loadCompanies(token)
++    setApprovingId(null)
++  }
++
++  if (!token) return null
++
++  return (
++    <div className="min-h-screen bg-gray-100">
++      <AdminNav />
++
++      <main className="max-w-5xl mx-auto px-6 py-8">
++        <h2 className="text-2xl font-semibold text-gray-700 mb-6">Empresas</h2>
++
++        {loading ? (
++          <p className="text-gray-500">Cargando empresas...</p>
++        ) : companies.length === 0 ? (
++          <p className="text-gray-500">No hay empresas registradas todavía.</p>
++        ) : (
++          <div className="space-y-4">
++            {companies.map((company) => (
++              <div key={company.id} className="bg-white rounded-lg shadow-sm p-5">
++                <div className="flex justify-between items-start flex-wrap gap-3">
++                  <div>
++                    <p className="font-medium text-gray-800">{company.name}</p>
++                    <p className="text-sm text-gray-500">{company.email} · {company.phone}</p>
++                    <p className="text-sm text-gray-500">CUIT: {company.cuit}</p>
++                    <p className="text-xs text-gray-400 mt-1">
++                      Comisión: {company.commission_pct}% · Alta: {new Date(company.created_at).toLocaleDateString('es-AR')}
++                    </p>
++                  </div>
++                  <div className="text-right">
++                    {company.approved ? (
++                      <span className="text-xs font-medium px-2 py-1 rounded-full bg-green-100 text-green-800">
++                        Aprobada
++                      </span>
++                    ) : (
++                      <div className="flex flex-col items-end gap-2">
++                        <span className="text-xs font-medium px-2 py-1 rounded-full bg-yellow-100 text-yellow-800">
++                          Pendiente
++                        </span>
++                        <button
++                          onClick={() => handleApprove(company.id)}
++                          disabled={approvingId === company.id}
++                          className="text-sm bg-blue-600 text-white px-3 py-1.5 rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors"
++                        >
++                          {approvingId === company.id ? 'Aprobando...' : 'Aprobar'}
++                        </button>
++                      </div>
++                    )}
++                  </div>
++                </div>
++              </div>
++            ))}
++          </div>
++        )}
++      </main>
++    </div>
++  )
++}
+diff --git a/app/admin/dashboard/orders/page.tsx b/app/admin/dashboard/orders/page.tsx
+new file mode 100644
+index 0000000..dee9560
+--- /dev/null
++++ b/app/admin/dashboard/orders/page.tsx
+@@ -0,0 +1,85 @@
++'use client'
++
++import { useEffect, useState } from 'react'
++import { API_URL, authHeaders } from '@/lib/api'
++import { useAdminAuth } from '@/lib/useAdminAuth'
++import AdminNav from '@/components/AdminNav'
++
++interface Order {
++  id: string
++  status: string
++  total: number
++  delivery_address: string
++  created_at: string
++  company: { id: string; name: string } | null
++  user: { id: string; name: string } | null
++}
++
++const statusColors: Record<string, string> = {
++  pending: 'bg-yellow-100 text-yellow-800',
++  accepted: 'bg-blue-100 text-blue-800',
++  assigned: 'bg-purple-100 text-purple-800',
++  delivered: 'bg-orange-100 text-orange-800',
++  picked_up: 'bg-indigo-100 text-indigo-800',
++  completed: 'bg-green-100 text-green-800',
++  cancelled: 'bg-red-100 text-red-800',
++}
++
++export default function AdminOrdersPage() {
++  const token = useAdminAuth()
++  const [orders, setOrders] = useState<Order[]>([])
++  const [loading, setLoading] = useState(true)
++
++  useEffect(() => {
++    if (!token) return
++    fetch(`${API_URL}/orders`, { headers: authHeaders(token) })
++      .then((r) => r.json())
++      .then((data) => setOrders(Array.isArray(data) ? data : []))
++      .finally(() => setLoading(false))
++  }, [token])
++
++  if (!token) return null
++
++  return (
++    <div className="min-h-screen bg-gray-100">
++      <AdminNav />
++
++      <main className="max-w-5xl mx-auto px-6 py-8">
++        <h2 className="text-2xl font-semibold text-gray-700 mb-6">Órdenes</h2>
++
++        {loading ? (
++          <p className="text-gray-500">Cargando órdenes...</p>
++        ) : orders.length === 0 ? (
++          <p className="text-gray-500">No hay órdenes todavía.</p>
++        ) : (
++          <div className="space-y-4">
++            {orders.map((order) => (
++              <div key={order.id} className="bg-white rounded-lg shadow-sm p-5">
++                <div className="flex justify-between items-start flex-wrap gap-3">
++                  <div>
++                    <p className="text-sm text-gray-500 mb-1">ID: {order.id.slice(0, 8)}...</p>
++                    <p className="font-medium text-gray-800">{order.delivery_address ?? 'Sin dirección'}</p>
++                    <p className="text-sm text-gray-500 mt-1">
++                      {order.company?.name ?? 'Empresa sin datos'} · {order.user?.name ?? 'Cliente sin datos'}
++                    </p>
++                    <p className="text-sm text-gray-400">
++                      {new Date(order.created_at).toLocaleDateString('es-AR')}
++                    </p>
++                  </div>
++                  <div className="text-right">
++                    <span className={`text-xs font-medium px-2 py-1 rounded-full ${statusColors[order.status] ?? 'bg-gray-100 text-gray-800'}`}>
++                      {order.status}
++                    </span>
++                    <p className="text-lg font-semibold text-gray-800 mt-2">
++                      ${Number(order.total).toLocaleString('es-AR')}
++                    </p>
++                  </div>
++                </div>
++              </div>
++            ))}
++          </div>
++        )}
++      </main>
++    </div>
++  )
++}
+diff --git a/app/admin/dashboard/page.tsx b/app/admin/dashboard/page.tsx
+new file mode 100644
+index 0000000..592d02f
+--- /dev/null
++++ b/app/admin/dashboard/page.tsx
+@@ -0,0 +1,81 @@
++'use client'
++
++import { useEffect, useState } from 'react'
++import { API_URL, authHeaders } from '@/lib/api'
++import { useAdminAuth } from '@/lib/useAdminAuth'
++import AdminNav from '@/components/AdminNav'
++
++interface Company {
++  id: string
++  approved: boolean
++}
++
++interface User {
++  id: string
++}
++
++interface Order {
++  id: string
++  status: string
++}
++
++export default function AdminDashboardPage() {
++  const token = useAdminAuth()
++  const [companies, setCompanies] = useState<Company[] | null>(null)
++  const [users, setUsers] = useState<User[] | null>(null)
++  const [orders, setOrders] = useState<Order[] | null>(null)
++
++  useEffect(() => {
++    if (!token) return
++
++    const headers = authHeaders(token)
++
++    Promise.all([
++      fetch(`${API_URL}/companies`, { headers }).then((r) => (r.ok ? r.json() : [])),
++      fetch(`${API_URL}/users`, { headers }).then((r) => (r.ok ? r.json() : [])),
++      fetch(`${API_URL}/orders`, { headers }).then((r) => (r.ok ? r.json() : [])),
++    ]).then(([companiesData, usersData, ordersData]) => {
++      setCompanies(Array.isArray(companiesData) ? companiesData : [])
++      setUsers(Array.isArray(usersData) ? usersData : [])
++      setOrders(Array.isArray(ordersData) ? ordersData : [])
++    })
++  }, [token])
++
++  const loading = companies === null || users === null || orders === null
++  const pendingCompanies = companies?.filter((c) => !c.approved).length ?? 0
++  const activeOrders = orders?.filter(
++    (o) => o.status !== 'completed' && o.status !== 'cancelled',
++  ).length ?? 0
++
++  const stats = [
++    { label: 'Empresas', value: companies?.length ?? 0, sub: `${pendingCompanies} pendientes de aprobación` },
++    { label: 'Usuarios', value: users?.length ?? 0, sub: 'Registrados en la plataforma' },
++    { label: 'Órdenes', value: orders?.length ?? 0, sub: `${activeOrders} en curso` },
++  ]
++
++  if (!token) return null
++
++  return (
++    <div className="min-h-screen bg-gray-100">
++      <AdminNav />
++
++      <main className="max-w-5xl mx-auto px-6 py-8">
++        <h2 className="text-2xl font-semibold text-gray-700 mb-6">Resumen</h2>
++
++        {loading ? (
++          <p className="text-gray-500">Cargando...</p>
++        ) : (
++          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
++            {stats.map((stat) => (
++              <div key={stat.label} className="bg-white rounded-lg shadow-sm p-5">
++                <p className="text-sm text-gray-500">{stat.label}</p>
++                <p className="text-3xl font-bold text-gray-800 mt-1">{stat.value}</p>
++                <p className="text-xs text-gray-400 mt-2">{stat.sub}</p>
++              </div>
++            ))}
++          </div>
++        )}
++      </main>
++    </div>
++  )
++}
+diff --git a/app/admin/dashboard/users/page.tsx b/app/admin/dashboard/users/page.tsx
+new file mode 100644
+index 0000000..fa9be0d
+--- /dev/null
++++ b/app/admin/dashboard/users/page.tsx
+@@ -0,0 +1,85 @@
++'use client'
++
++import { useEffect, useState } from 'react'
++import { API_URL, authHeaders } from '@/lib/api'
++import { useAdminAuth } from '@/lib/useAdminAuth'
++import AdminNav from '@/components/AdminNav'
++
++interface User {
++  id: string
++  name: string
++  email: string
++  phone: string | null
++  role: string
++  created_at: string
++}
++
++const roleColors: Record<string, string> = {
++  admin: 'bg-purple-100 text-purple-800',
++  company: 'bg-blue-100 text-blue-800',
++  constructor: 'bg-gray-100 text-gray-800',
++}
++
++export default function AdminUsersPage() {
++  const token = useAdminAuth()
++  const [users, setUsers] = useState<User[]>([])
++  const [loading, setLoading] = useState(true)
++
++  useEffect(() => {
++    if (!token) return
++    fetch(`${API_URL}/users`, { headers: authHeaders(token) })
++      .then((r) => r.json())
++      .then((data) => setUsers(Array.isArray(data) ? data : []))
++      .finally(() => setLoading(false))
++  }, [token])
++
++  if (!token) return null
++
++  return (
++    <div className="min-h-screen bg-gray-100">
++      <AdminNav />
++
++      <main className="max-w-5xl mx-auto px-6 py-8">
++        <h2 className="text-2xl font-semibold text-gray-700 mb-6">Usuarios</h2>
++
++        {loading ? (
++          <p className="text-gray-500">Cargando usuarios...</p>
++        ) : users.length === 0 ? (
++          <p className="text-gray-500">No hay usuarios registrados todavía.</p>
++        ) : (
++          <div className="bg-white rounded-lg shadow-sm overflow-hidden">
++            <table className="w-full text-left">
++              <thead className="bg-gray-50 border-b border-gray-200">
++                <tr>
++                  <th className="px-5 py-3 text-xs font-medium text-gray-500 uppercase">Nombre</th>
++                  <th className="px-5 py-3 text-xs font-medium text-gray-500 uppercase">Contacto</th>
++                  <th className="px-5 py-3 text-xs font-medium text-gray-500 uppercase">Rol</th>
++                  <th className="px-5 py-3 text-xs font-medium text-gray-500 uppercase">Alta</th>
++                </tr>
++              </thead>
++              <tbody className="divide-y divide-gray-100">
++                {users.map((user) => (
++                  <tr key={user.id}>
++                    <td className="px-5 py-3 text-gray-800">{user.name}</td>
++                    <td className="px-5 py-3 text-gray-500 text-sm">
++                      {user.email}
++                      {user.phone && <span className="block">{user.phone}</span>}
++                    </td>
++                    <td className="px-5 py-3">
++                      <span className={`text-xs font-medium px-2 py-1 rounded-full ${roleColors[user.role] ?? 'bg-gray-100 text-gray-800'}`}>
++                        {user.role}
++                      </span>
++                    </td>
++                    <td className="px-5 py-3 text-gray-500 text-sm">
++                      {new Date(user.created_at).toLocaleDateString('es-AR')}
++                    </td>
++                  </tr>
++                ))}
++              </tbody>
++            </table>
++          </div>
++        )}
++      </main>
++    </div>
++  )
++}
+diff --git a/app/admin/login/page.tsx b/app/admin/login/page.tsx
+new file mode 100644
+index 0000000..ef01db6
+--- /dev/null
++++ b/app/admin/login/page.tsx
+@@ -0,0 +1,90 @@
++'use client'
++
++import { useState } from 'react'
++import { useRouter } from 'next/navigation'
++import { API_URL } from '@/lib/api'
++
++export default function AdminLoginPage() {
++  const router = useRouter()
++  const [email, setEmail] = useState('')
++  const [password, setPassword] = useState('')
++  const [error, setError] = useState('')
++  const [loading, setLoading] = useState(false)
++
++  async function handleLogin() {
++    setLoading(true)
++    setError('')
++
++    try {
++      const res = await fetch(`${API_URL}/auth/login`, {
++        method: 'POST',
++        headers: { 'Content-Type': 'application/json' },
++        body: JSON.stringify({ email, password }),
++      })
++
++      const data = await res.json()
++
++      if (!res.ok) {
++        setError('Email o contraseña incorrectos')
++        return
++      }
++
++      if (data.user?.role !== 'admin') {
++        setError('Esta cuenta no tiene permisos de administrador')
++        return
++      }
++
++      localStorage.setItem('admin_token', data.access_token)
++      localStorage.setItem('admin_user', JSON.stringify(data.user))
++      router.push('/admin/dashboard')
++
++    } catch {
++      setError('Error de conexión')
++    } finally {
++      setLoading(false)
++    }
++  }
++
++  return (
++    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
++      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
++        <h1 className="text-2xl font-bold text-gray-800 mb-6">Volquetes — Panel Admin</h1>
++
++        <div className="mb-4">
++          <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
++          <input
++            type="email"
++            value={email}
++            onChange={(e) => setEmail(e.target.value)}
++            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
++            placeholder="admin@volquetes.com"
++          />
++        </div>
++
++        <div className="mb-6">
++          <label className="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
++          <input
++            type="password"
++            value={password}
++            onChange={(e) => setPassword(e.target.value)}
++            onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
++            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
++            placeholder="••••••••"
++          />
++        </div>
++
++        {error && (
++          <p className="text-red-500 text-sm mb-4">{error}</p>
++        )}
++
++        <button
++          onClick={handleLogin}
++          disabled={loading}
++          className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors"
++        >
++          {loading ? 'Ingresando...' : 'Ingresar'}
++        </button>
++      </div>
++    </div>
++  )
++}
+diff --git a/app/admin/page.tsx b/app/admin/page.tsx
+new file mode 100644
+index 0000000..6fda580
+--- /dev/null
++++ b/app/admin/page.tsx
+@@ -0,0 +1,5 @@
++import { redirect } from 'next/navigation'
++
++export default function AdminHome() {
++  redirect('/admin/login')
++}
+diff --git a/components/AdminNav.tsx b/components/AdminNav.tsx
+new file mode 100644
+index 0000000..f9c2021
+--- /dev/null
++++ b/components/AdminNav.tsx
+@@ -0,0 +1,50 @@
++'use client'
++
++import { useRouter, usePathname } from 'next/navigation'
++import { logout } from '@/lib/api'
++
++const links = [
++  { href: '/admin/dashboard', label: 'Resumen' },
++  { href: '/admin/dashboard/companies', label: 'Empresas' },
++  { href: '/admin/dashboard/users', label: 'Usuarios' },
++  { href: '/admin/dashboard/orders', label: 'Órdenes' },
++]
++
++export default function AdminNav() {
++  const router = useRouter()
++  const pathname = usePathname()
++
++  function handleLogout() {
++    logout()
++    router.push('/admin/login')
++  }
++
++  return (
++    <nav className="bg-white shadow-sm px-6 py-4 flex justify-between items-center flex-wrap gap-3">
++      <div className="flex items-center gap-6 flex-wrap">
++        <h1 className="text-xl font-bold text-gray-800">Volquetes — Panel Admin</h1>
++        <div className="flex gap-4">
++          {links.map((link) => (
++            <button
++              key={link.href}
++              onClick={() => router.push(link.href)}
++              className={`text-sm font-medium transition-colors ${
++                pathname === link.href
++                  ? 'text-blue-600'
++                  : 'text-gray-500 hover:text-gray-800'
++              }`}
++            >
++              {link.label}
++            </button>
++          ))}
++        </div>
++      </div>
++      <button
++        onClick={handleLogout}
++        className="text-sm text-red-600 hover:text-red-800 transition-colors"
++      >
++        Cerrar sesión
++      </button>
++    </nav>
++  )
++}
+diff --git a/lib/api.ts b/lib/api.ts
+new file mode 100644
+index 0000000..cd2355c
+--- /dev/null
++++ b/lib/api.ts
+@@ -0,0 +1,33 @@
++export const API_URL = 'https://bolquetes-api-production.up.railway.app'
++
++export interface StoredUser {
++  id: string
++  name: string
++  email: string
++  role: string
++}
++
++export function getToken(): string | null {
++  if (typeof window === 'undefined') return null
++  return localStorage.getItem('admin_token')
++}
++
++export function getStoredUser(): StoredUser | null {
++  if (typeof window === 'undefined') return null
++  const raw = localStorage.getItem('admin_user')
++  if (!raw) return null
++  try {
++    return JSON.parse(raw) as StoredUser
++  } catch {
++    return null
++  }
++}
++
++export function authHeaders(token: string): HeadersInit {
++  return { Authorization: `Bearer ${token}` }
++}
++
++export function logout() {
++  localStorage.removeItem('admin_token')
++  localStorage.removeItem('admin_user')
++}
+diff --git a/lib/useAdminAuth.ts b/lib/useAdminAuth.ts
+new file mode 100644
+index 0000000..afb0625
+--- /dev/null
++++ b/lib/useAdminAuth.ts
+@@ -0,0 +1,26 @@
++'use client'
++
++import { useEffect, useState } from 'react'
++import { useRouter } from 'next/navigation'
++import { getStoredUser, getToken, logout } from './api'
++
++/**
++ * Redirects to /admin/login if there is no admin token or the stored user isn't an admin.
++ * Returns the current token once the check has passed (null while unauthorized/redirecting).
++ */
++export function useAdminAuth(): string | null {
++  const router = useRouter()
++  const [token] = useState(() => getToken())
++  const [user] = useState(() => getStoredUser())
++
++  const authorized = !!token && user?.role === 'admin'
++
++  useEffect(() => {
++    if (!authorized) {
++      logout()
++      router.push('/admin/login')
++    }
++  }, [authorized, router])
++
++  return authorized ? token : null
++}
