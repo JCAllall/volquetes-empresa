@@ -47,11 +47,11 @@ export default function AdminCompaniesPage() {
   if (!token) return null
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-brand-50">
       <AdminNav />
 
       <main className="max-w-5xl mx-auto px-6 py-8">
-        <h2 className="text-2xl font-semibold text-gray-700 mb-6">Empresas</h2>
+        <h2 className="text-2xl font-semibold text-brand-700 mb-6">Empresas</h2>
 
         {loading ? (
           <p className="text-gray-500">Cargando empresas...</p>
@@ -83,7 +83,7 @@ export default function AdminCompaniesPage() {
                         <button
                           onClick={() => handleApprove(company.id)}
                           disabled={approvingId === company.id}
-                          className="text-sm bg-blue-600 text-white px-3 py-1.5 rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                          className="text-sm bg-accent-500 text-white px-3 py-1.5 rounded-md hover:bg-accent-600 disabled:opacity-50 transition-colors font-medium"
                         >
                           {approvingId === company.id ? 'Aprobando...' : 'Aprobar'}
                         </button>

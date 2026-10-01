@@ -1,0 +1,475 @@
+diff --git a/app/admin/dashboard/companies/page.tsx b/app/admin/dashboard/companies/page.tsx
+index 1671beb..0dd29e4 100644
+--- a/app/admin/dashboard/companies/page.tsx
++++ b/app/admin/dashboard/companies/page.tsx
+@@ -47,11 +47,11 @@ export default function AdminCompaniesPage() {
+   if (!token) return null
+ 
+   return (
+-    <div className="min-h-screen bg-gray-100">
++    <div className="min-h-screen bg-brand-50">
+       <AdminNav />
+ 
+       <main className="max-w-5xl mx-auto px-6 py-8">
+-        <h2 className="text-2xl font-semibold text-gray-700 mb-6">Empresas</h2>
++        <h2 className="text-2xl font-semibold text-brand-700 mb-6">Empresas</h2>
+ 
+         {loading ? (
+           <p className="text-gray-500">Cargando empresas...</p>
+@@ -83,7 +83,7 @@ export default function AdminCompaniesPage() {
+                         <button
+                           onClick={() => handleApprove(company.id)}
+                           disabled={approvingId === company.id}
+-                          className="text-sm bg-blue-600 text-white px-3 py-1.5 rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors"
++                          className="text-sm bg-accent-500 text-white px-3 py-1.5 rounded-md hover:bg-accent-600 disabled:opacity-50 transition-colors font-medium"
+                         >
+                           {approvingId === company.id ? 'Aprobando...' : 'Aprobar'}
+                         </button>
+diff --git a/app/admin/dashboard/orders/page.tsx b/app/admin/dashboard/orders/page.tsx
+index dee9560..b462bb3 100644
+--- a/app/admin/dashboard/orders/page.tsx
++++ b/app/admin/dashboard/orders/page.tsx
+@@ -41,11 +41,11 @@ export default function AdminOrdersPage() {
+   if (!token) return null
+ 
+   return (
+-    <div className="min-h-screen bg-gray-100">
++    <div className="min-h-screen bg-brand-50">
+       <AdminNav />
+ 
+       <main className="max-w-5xl mx-auto px-6 py-8">
+-        <h2 className="text-2xl font-semibold text-gray-700 mb-6">Órdenes</h2>
++        <h2 className="text-2xl font-semibold text-brand-700 mb-6">Órdenes</h2>
+ 
+         {loading ? (
+           <p className="text-gray-500">Cargando órdenes...</p>
+diff --git a/app/admin/dashboard/page.tsx b/app/admin/dashboard/page.tsx
+index 592d02f..7fba27e 100644
+--- a/app/admin/dashboard/page.tsx
++++ b/app/admin/dashboard/page.tsx
+@@ -56,11 +56,11 @@ export default function AdminDashboardPage() {
+   if (!token) return null
+ 
+   return (
+-    <div className="min-h-screen bg-gray-100">
++    <div className="min-h-screen bg-brand-50">
+       <AdminNav />
+ 
+       <main className="max-w-5xl mx-auto px-6 py-8">
+-        <h2 className="text-2xl font-semibold text-gray-700 mb-6">Resumen</h2>
++        <h2 className="text-2xl font-semibold text-brand-700 mb-6">Resumen</h2>
+ 
+         {loading ? (
+           <p className="text-gray-500">Cargando...</p>
+diff --git a/app/admin/dashboard/users/page.tsx b/app/admin/dashboard/users/page.tsx
+index fa9be0d..886d33b 100644
+--- a/app/admin/dashboard/users/page.tsx
++++ b/app/admin/dashboard/users/page.tsx
+@@ -36,11 +36,11 @@ export default function AdminUsersPage() {
+   if (!token) return null
+ 
+   return (
+-    <div className="min-h-screen bg-gray-100">
++    <div className="min-h-screen bg-brand-50">
+       <AdminNav />
+ 
+       <main className="max-w-5xl mx-auto px-6 py-8">
+-        <h2 className="text-2xl font-semibold text-gray-700 mb-6">Usuarios</h2>
++        <h2 className="text-2xl font-semibold text-brand-700 mb-6">Usuarios</h2>
+ 
+         {loading ? (
+           <p className="text-gray-500">Cargando usuarios...</p>
+diff --git a/app/admin/login/page.tsx b/app/admin/login/page.tsx
+index ef01db6..0933b7a 100644
+--- a/app/admin/login/page.tsx
++++ b/app/admin/login/page.tsx
+@@ -3,6 +3,7 @@
+ import { useState } from 'react'
+ import { useRouter } from 'next/navigation'
+ import { API_URL } from '@/lib/api'
++import Logo from '@/components/Logo'
+ 
+ export default function AdminLoginPage() {
+   const router = useRouter()
+@@ -46,29 +47,33 @@ export default function AdminLoginPage() {
+   }
+ 
+   return (
+-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+-        <h1 className="text-2xl font-bold text-gray-800 mb-6">Volquetes — Panel Admin</h1>
++    <div className="min-h-screen bg-brand-50 flex items-center justify-center px-4">
++      <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-md border border-brand-100">
++        <div className="flex flex-col items-center gap-2 mb-6">
++          <Logo size={40} />
++          <p className="text-sm text-brand-500 font-medium">Panel de administración</p>
++        </div>
+ 
+         <div className="mb-4">
+-          <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
++          <label className="block text-sm font-medium text-brand-600 mb-1">Email</label>
+           <input
+             type="email"
+             value={email}
+             onChange={(e) => setEmail(e.target.value)}
+-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+-            placeholder="admin@volquetes.com"
++            onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
++            className="w-full border border-brand-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent-500"
++            placeholder="admin@bilny.com"
+           />
+         </div>
+ 
+         <div className="mb-6">
+-          <label className="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
++          <label className="block text-sm font-medium text-brand-600 mb-1">Contraseña</label>
+           <input
+             type="password"
+             value={password}
+             onChange={(e) => setPassword(e.target.value)}
+             onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
+-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
++            className="w-full border border-brand-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent-500"
+             placeholder="••••••••"
+           />
+         </div>
+@@ -80,7 +85,7 @@ export default function AdminLoginPage() {
+         <button
+           onClick={handleLogin}
+           disabled={loading}
+-          className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors"
++          className="w-full bg-accent-500 text-white py-2 px-4 rounded-md hover:bg-accent-600 disabled:opacity-50 transition-colors font-medium"
+         >
+           {loading ? 'Ingresando...' : 'Ingresar'}
+         </button>
+diff --git a/app/dashboard/orders/[id]/page.tsx b/app/dashboard/orders/[id]/page.tsx
+index ca0a160..d8b6be8 100644
+--- a/app/dashboard/orders/[id]/page.tsx
++++ b/app/dashboard/orders/[id]/page.tsx
+@@ -2,6 +2,7 @@
+ 
+ import { useEffect, useState } from 'react'
+ import { useRouter, useParams } from 'next/navigation'
++import Logo from '@/components/Logo'
+ 
+ interface Order {
+   id: string
+@@ -115,10 +116,12 @@ export default function OrderDetailPage() {
+   if (!order) return <div className="min-h-screen flex items-center justify-center"><p className="text-gray-500">Orden no encontrada</p></div>
+ 
+   return (
+-    <div className="min-h-screen bg-gray-100">
+-      <nav className="bg-white shadow-sm px-6 py-4 flex items-center gap-4">
+-        <button onClick={() => router.push('/dashboard')} className="text-gray-500 hover:text-gray-800">← Volver</button>
+-        <h1 className="text-xl font-bold text-gray-800">Detalle de Orden</h1>
++    <div className="min-h-screen bg-brand-50">
++      <nav className="bg-white border-b border-brand-100 px-6 py-4 flex items-center gap-4">
++        <button onClick={() => router.push('/dashboard')} className="text-brand-500 hover:text-brand-700 transition-colors">← Volver</button>
++        <Logo size={26} />
++        <span className="text-brand-200">·</span>
++        <h1 className="text-lg font-semibold text-brand-700">Detalle de Orden</h1>
+       </nav>
+ 
+       <main className="max-w-3xl mx-auto px-6 py-8 space-y-6">
+@@ -143,7 +146,7 @@ export default function OrderDetailPage() {
+             <button
+               onClick={updateStatus}
+               disabled={updating}
+-              className="mt-4 w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors"
++              className="mt-4 w-full bg-accent-500 text-white py-2 rounded-md hover:bg-accent-600 disabled:opacity-50 transition-colors font-medium"
+             >
+               {updating ? 'Actualizando...' : `Avanzar a "${nextStatus[order.status]}"`}
+             </button>
+diff --git a/app/dashboard/page.tsx b/app/dashboard/page.tsx
+index 979eab7..d2360ac 100644
+--- a/app/dashboard/page.tsx
++++ b/app/dashboard/page.tsx
+@@ -2,6 +2,7 @@
+ 
+ import { useEffect, useState } from 'react'
+ import { useRouter } from 'next/navigation'
++import Logo from '@/components/Logo'
+ 
+ interface Order {
+   id: string
+@@ -50,9 +51,9 @@ export default function DashboardPage() {
+   }
+ 
+   return (
+-    <div className="min-h-screen bg-gray-100">
+-      <nav className="bg-white shadow-sm px-6 py-4 flex justify-between items-center">
+-        <h1 className="text-xl font-bold text-gray-800">Volquetes — Panel Empresas</h1>
++    <div className="min-h-screen bg-brand-50">
++      <nav className="bg-white border-b border-brand-100 px-6 py-4 flex justify-between items-center">
++        <Logo size={30} />
+         <button
+           onClick={handleLogout}
+           className="text-sm text-red-600 hover:text-red-800 transition-colors"
+@@ -62,7 +63,7 @@ export default function DashboardPage() {
+       </nav>
+ 
+       <main className="max-w-5xl mx-auto px-6 py-8">
+-        <h2 className="text-2xl font-semibold text-gray-700 mb-6">Órdenes</h2>
++        <h2 className="text-2xl font-semibold text-brand-700 mb-6">Órdenes</h2>
+ 
+         {loading ? (
+           <p className="text-gray-500">Cargando órdenes...</p>
+diff --git a/app/globals.css b/app/globals.css
+index a2dc41e..dc277c3 100644
+--- a/app/globals.css
++++ b/app/globals.css
+@@ -3,6 +3,17 @@
+ :root {
+   --background: #ffffff;
+   --foreground: #171717;
++
++  /* Bilny brand palette (Industrial Azul) */
++  --color-brand-50: #f8fafc;
++  --color-brand-100: #f1f5f9;
++  --color-brand-200: #e2e8f0;
++  --color-brand-500: #334155;
++  --color-brand-600: #1e293b;
++  --color-brand-700: #0f172a;
++  --color-accent-400: #fbbf24;
++  --color-accent-500: #f59e0b;
++  --color-accent-600: #d97706;
+ }
+ 
+ @theme inline {
+@@ -10,6 +21,16 @@
+   --color-foreground: var(--foreground);
+   --font-sans: var(--font-geist-sans);
+   --font-mono: var(--font-geist-mono);
++
++  --color-brand-50: var(--color-brand-50);
++  --color-brand-100: var(--color-brand-100);
++  --color-brand-200: var(--color-brand-200);
++  --color-brand-500: var(--color-brand-500);
++  --color-brand-600: var(--color-brand-600);
++  --color-brand-700: var(--color-brand-700);
++  --color-accent-400: var(--color-accent-400);
++  --color-accent-500: var(--color-accent-500);
++  --color-accent-600: var(--color-accent-600);
+ }
+ 
+ @media (prefers-color-scheme: dark) {
+diff --git a/app/icon.tsx b/app/icon.tsx
+new file mode 100644
+index 0000000..3cfc534
+--- /dev/null
++++ b/app/icon.tsx
+@@ -0,0 +1,35 @@
++import { ImageResponse } from 'next/og'
++
++export const size = { width: 32, height: 32 }
++export const contentType = 'image/png'
++
++export default function Icon() {
++  return new ImageResponse(
++    (
++      <div
++        style={{
++          width: '100%',
++          height: '100%',
++          borderRadius: 8,
++          background: '#F59E0B',
++          display: 'flex',
++          alignItems: 'center',
++          justifyContent: 'center',
++          position: 'relative',
++          overflow: 'hidden',
++        }}
++      >
++        <div
++          style={{
++            position: 'absolute',
++            inset: 0,
++            background:
++              'linear-gradient(135deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0) 55%)',
++          }}
++        />
++        <span style={{ color: 'white', fontSize: 20, fontWeight: 800 }}>B</span>
++      </div>
++    ),
++    { ...size },
++  )
++}
+diff --git a/app/layout.tsx b/app/layout.tsx
+index 9852c15..bf803df 100644
+--- a/app/layout.tsx
++++ b/app/layout.tsx
+@@ -13,14 +13,14 @@ const geistMono = Geist_Mono({
+ });
+ 
+ export const metadata: Metadata = {
+-  title: "Create Next App",
+-  description: "Generated by create next app",
++  title: "Bilny",
++  description: "Pedí y gestioná volquetes de forma simple.",
+ };
+ 
+ export default function RootLayout({ children }: LayoutProps<"/">) {
+   return (
+     <html
+-      lang="en"
++      lang="es"
+       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+     >
+       <body className="min-h-full flex flex-col">{children}</body>
+diff --git a/app/login/page.tsx b/app/login/page.tsx
+index 295ea77..d52caf7 100644
+--- a/app/login/page.tsx
++++ b/app/login/page.tsx
+@@ -2,6 +2,7 @@
+ 
+ import { useState } from 'react'
+ import { useRouter } from 'next/navigation'
++import Logo from '@/components/Logo'
+ 
+ export default function LoginPage() {
+   const router = useRouter()
+@@ -39,28 +40,33 @@ export default function LoginPage() {
+   }
+ 
+   return (
+-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+-        <h1 className="text-2xl font-bold text-gray-800 mb-6">Volquetes — Panel Empresas</h1>
++    <div className="min-h-screen bg-brand-50 flex items-center justify-center px-4">
++      <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-md border border-brand-100">
++        <div className="flex flex-col items-center gap-2 mb-6">
++          <Logo size={40} />
++          <p className="text-sm text-brand-500 font-medium">Panel de empresas</p>
++        </div>
+ 
+         <div className="mb-4">
+-          <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
++          <label className="block text-sm font-medium text-brand-600 mb-1">Email</label>
+           <input
+             type="email"
+             value={email}
+             onChange={(e) => setEmail(e.target.value)}
+-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
++            onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
++            className="w-full border border-brand-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent-500"
+             placeholder="contacto@empresa.com"
+           />
+         </div>
+ 
+         <div className="mb-6">
+-          <label className="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
++          <label className="block text-sm font-medium text-brand-600 mb-1">Contraseña</label>
+           <input
+             type="password"
+             value={password}
+             onChange={(e) => setPassword(e.target.value)}
+-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
++            onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
++            className="w-full border border-brand-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent-500"
+             placeholder="••••••••"
+           />
+         </div>
+@@ -72,7 +78,7 @@ export default function LoginPage() {
+         <button
+           onClick={handleLogin}
+           disabled={loading}
+-          className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:opacity-50 transition-colors"
++          className="w-full bg-accent-500 text-white py-2 px-4 rounded-md hover:bg-accent-600 disabled:opacity-50 transition-colors font-medium"
+         >
+           {loading ? 'Ingresando...' : 'Ingresar'}
+         </button>
+diff --git a/components/AdminNav.tsx b/components/AdminNav.tsx
+index f9c2021..793ba82 100644
+--- a/components/AdminNav.tsx
++++ b/components/AdminNav.tsx
+@@ -2,6 +2,7 @@
+ 
+ import { useRouter, usePathname } from 'next/navigation'
+ import { logout } from '@/lib/api'
++import Logo from '@/components/Logo'
+ 
+ const links = [
+   { href: '/admin/dashboard', label: 'Resumen' },
+@@ -20,9 +21,14 @@ export default function AdminNav() {
+   }
+ 
+   return (
+-    <nav className="bg-white shadow-sm px-6 py-4 flex justify-between items-center flex-wrap gap-3">
++    <nav className="bg-brand-700 px-6 py-4 flex justify-between items-center flex-wrap gap-3">
+       <div className="flex items-center gap-6 flex-wrap">
+-        <h1 className="text-xl font-bold text-gray-800">Volquetes — Panel Admin</h1>
++        <div className="flex items-center gap-2">
++          <Logo variant="light" size={30} />
++          <span className="text-xs font-semibold uppercase tracking-wide text-brand-200 border-l border-brand-500 pl-2">
++            Admin
++          </span>
++        </div>
+         <div className="flex gap-4">
+           {links.map((link) => (
+             <button
+@@ -30,8 +36,8 @@ export default function AdminNav() {
+               onClick={() => router.push(link.href)}
+               className={`text-sm font-medium transition-colors ${
+                 pathname === link.href
+-                  ? 'text-blue-600'
+-                  : 'text-gray-500 hover:text-gray-800'
++                  ? 'text-accent-400'
++                  : 'text-brand-200 hover:text-white'
+               }`}
+             >
+               {link.label}
+@@ -41,7 +47,7 @@ export default function AdminNav() {
+       </div>
+       <button
+         onClick={handleLogout}
+-        className="text-sm text-red-600 hover:text-red-800 transition-colors"
++        className="text-sm text-red-400 hover:text-red-300 transition-colors"
+       >
+         Cerrar sesión
+       </button>
+diff --git a/components/Logo.tsx b/components/Logo.tsx
+new file mode 100644
+index 0000000..d9344ba
+--- /dev/null
++++ b/components/Logo.tsx
+@@ -0,0 +1,40 @@
++type LogoProps = {
++  /** 'light' = texto claro (para fondos oscuros), 'dark' = texto oscuro (para fondos claros) */
++  variant?: 'light' | 'dark'
++  size?: number
++  showWordmark?: boolean
++  className?: string
++}
++
++export default function Logo({
++  variant = 'dark',
++  size = 28,
++  showWordmark = true,
++  className = '',
++}: LogoProps) {
++  const textColor = variant === 'light' ? 'text-white' : 'text-brand-700'
++
++  return (
++    <div className={`flex items-center gap-2 ${className}`}>
++      <svg
++        width={size}
++        height={size}
++        viewBox="0 0 30 30"
++        fill="none"
++        aria-hidden="true"
++      >
++        <rect x="2" y="2" width="26" height="26" rx="7" className="fill-accent-500" />
++        <path
++          d="M2 18 L18 2 L28 2 L28 9 L9 28 L2 28 Z"
++          fill="white"
++          fillOpacity="0.22"
++        />
++      </svg>
++      {showWordmark && (
++        <span className={`font-extrabold tracking-tight ${textColor}`} style={{ fontSize: size * 0.68 }}>
++          Bilny
++        </span>
++      )}
++    </div>
++  )
++}

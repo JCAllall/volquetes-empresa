@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Logo from '@/components/Logo'
 
 interface Order {
   id: string
@@ -50,9 +51,9 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <nav className="bg-white shadow-sm px-6 py-4 flex justify-between items-center">
-        <h1 className="text-xl font-bold text-gray-800">Volquetes — Panel Empresas</h1>
+    <div className="min-h-screen bg-brand-50">
+      <nav className="bg-white border-b border-brand-100 px-6 py-4 flex justify-between items-center">
+        <Logo size={30} />
         <button
           onClick={handleLogout}
           className="text-sm text-red-600 hover:text-red-800 transition-colors"
@@ -62,7 +63,7 @@ export default function DashboardPage() {
       </nav>
 
       <main className="max-w-5xl mx-auto px-6 py-8">
-        <h2 className="text-2xl font-semibold text-gray-700 mb-6">Órdenes</h2>
+        <h2 className="text-2xl font-semibold text-brand-700 mb-6">Órdenes</h2>
 
         {loading ? (
           <p className="text-gray-500">Cargando órdenes...</p>

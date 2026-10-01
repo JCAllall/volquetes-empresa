@@ -36,11 +36,11 @@ export default function AdminUsersPage() {
   if (!token) return null
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-brand-50">
       <AdminNav />
 
       <main className="max-w-5xl mx-auto px-6 py-8">
-        <h2 className="text-2xl font-semibold text-gray-700 mb-6">Usuarios</h2>
+        <h2 className="text-2xl font-semibold text-brand-700 mb-6">Usuarios</h2>
 
         {loading ? (
           <p className="text-gray-500">Cargando usuarios...</p>
