@@ -2,7 +2,10 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Logo from '@/components/Logo'
+import Link from 'next/link'
+import AuthHeader from '@/components/AuthHeader'
+import AuthCard from '@/components/AuthCard'
+import AuthFooterNote from '@/components/AuthFooterNote'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -40,48 +43,62 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-brand-50 flex items-center justify-center px-4">
-      <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-md border border-brand-100">
-        <div className="flex flex-col items-center gap-2 mb-6">
-          <Logo size={40} />
-          <p className="text-sm text-brand-500 font-medium">Panel de empresas</p>
-        </div>
+    <div className="min-h-screen bg-brand-50 flex flex-col items-center justify-center px-4 py-10">
+      <div className="w-full max-w-sm flex flex-col items-center">
+        <AuthHeader subtitle="Panel de empresas" />
 
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-brand-600 mb-1">Email</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
-            className="w-full border border-brand-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent-500"
-            placeholder="contacto@empresa.com"
-          />
-        </div>
+        <AuthCard label="Acceso">
+          <div className="mb-4">
+            <label className="block text-[11px] font-bold uppercase tracking-wide text-brand-500 mb-1.5">
+              Email
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
+              className="w-full border-[1.5px] border-brand-200 rounded-md px-3 py-2.5 text-[15px] text-brand-700 bg-brand-50 focus:outline-none focus:border-brand-600"
+              placeholder="contacto@empresa.com"
+            />
+          </div>
 
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-brand-600 mb-1">Contraseña</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
-            className="w-full border border-brand-200 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent-500"
-            placeholder="••••••••"
-          />
-        </div>
+          <div className="mb-2">
+            <label className="block text-[11px] font-bold uppercase tracking-wide text-brand-500 mb-1.5">
+              Contraseña
+            </label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
+              className="w-full border-[1.5px] border-brand-200 rounded-md px-3 py-2.5 text-[15px] text-brand-700 bg-brand-50 focus:outline-none focus:border-brand-600"
+              placeholder="••••••••"
+            />
+          </div>
 
-        {error && (
-          <p className="text-red-500 text-sm mb-4">{error}</p>
-        )}
+          <div className="flex justify-end mb-5">
+            <Link
+              href="/forgot-password"
+              className="text-xs font-medium text-brand-500 hover:text-brand-700 transition-colors"
+            >
+              ¿Olvidaste tu contraseña?
+            </Link>
+          </div>
 
-        <button
-          onClick={handleLogin}
-          disabled={loading}
-          className="w-full bg-accent-500 text-white py-2 px-4 rounded-md hover:bg-accent-600 disabled:opacity-50 transition-colors font-medium"
-        >
-          {loading ? 'Ingresando...' : 'Ingresar'}
-        </button>
+          {error && (
+            <p className="text-red-500 text-sm mb-4">{error}</p>
+          )}
+
+          <button
+            onClick={handleLogin}
+            disabled={loading}
+            className="w-full bg-accent-500 text-brand-700 py-2.5 px-4 rounded-md hover:bg-accent-600 disabled:opacity-50 transition-colors font-extrabold uppercase tracking-wide text-[13px]"
+          >
+            {loading ? 'Ingresando...' : 'Ingresar'}
+          </button>
+        </AuthCard>
+
+        <AuthFooterNote />
       </div>
     </div>
   )
